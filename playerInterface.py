@@ -50,4 +50,6 @@ class PlayerInterface():
         This function gives you the color of the winner'''
         pass
 
-
+    def heuristic(self):
+        '''returns the score difference of both players'''
+        return 0

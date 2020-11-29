@@ -54,5 +54,15 @@ class myPlayer(PlayerInterface):
         else:
             print("I lost :(!!")
 
+    def heuristic(self):
+        score = 0 
+        (black, white) = compute_score(self)
+        if(self._mycolor == "white"):
+            score = white - black
+            return score
+        else:
+            score = black - white
+            return score
+        return score
 
 
