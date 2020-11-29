@@ -56,7 +56,7 @@ class myPlayer(PlayerInterface):
 
     def heuristic(self):
         score = 0 
-        (black, white) = compute_score(self)
+        (black, white) = self._board.compute_score()
         if(self._mycolor == "white"):
             score = white - black
             return score
