@@ -39,6 +39,36 @@ class myPlayer(PlayerInterface):
         # move is an internal representation. To communicate with the interface I need to change if to a string
         return Goban.Board.flat_to_name(move) 
 
+    def heuristic(self):
+        score = 0 
+        (black, white) = self._board.compute_score()
+        if(self._mycolor == "white"):
+            score = white - black
+            return score
+        else:
+            score = black - white
+            return score
+        return score
+
+    def MinMax(self, depth, player):
+        b = self._board
+        if(b.is_game_over() or depth == 0):
+            return self.heuristic()  
+        to_ret = 0
+        if(player):
+            to_ret = -10000
+        else:
+            to_ret = +10000
+        for m in b.legal_moves():
+            b.push(m)
+            res = self.MinMax(depth-1, not player)
+            b.pop()
+            if(player and res > to_ret):
+                to_ret = res
+            elif(not player and res < to_ret):
+                to_ret = res
+        return to_ret
+
     def playOpponentMove(self, move):
         print("Opponent played ", move) # New here
         # the board needs an internal represetation to push the move.  Not a string
@@ -54,15 +84,5 @@ class myPlayer(PlayerInterface):
         else:
             print("I lost :(!!")
 
-    def heuristic(self):
-        score = 0 
-        (black, white) = self._board.compute_score()
-        if(self._mycolor == "white"):
-            score = white - black
-            return score
-        else:
-            score = black - white
-            return score
-        return score
-
+    
 

@@ -27,7 +27,15 @@ class PlayerInterface():
         (it has to be legal, so at the end, weak_legal_moves() may not be sufficient here.)
         '''
         return "PASS" 
-
+    
+    def heuristic(self):
+        '''returns the score difference of both players'''
+        return 0
+    
+    def MinMax(self, depth, player):
+        ''' '''
+        return 0
+    
     def playOpponentMove(self, move): 
         '''Inform you that the oponent has played this move. You must play it with no 
         search (just update your local variables to take it into account)
@@ -50,6 +58,4 @@ class PlayerInterface():
         This function gives you the color of the winner'''
         pass
 
-    def heuristic(self):
-        '''returns the score difference of both players'''
-        return 0
+    
