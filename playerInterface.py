@@ -58,4 +58,8 @@ class PlayerInterface():
         This function gives you the color of the winner'''
         pass
 
+    def ABminimax(self, player, depth, alpha, beta):
+        return 0
     
+    def chooseMove(self, depth):
+        return 'PASS'

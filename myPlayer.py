@@ -29,7 +29,7 @@ class myPlayer(PlayerInterface):
             print("Referee told me to play but the game is over!")
             return "PASS" 
         moves = self._board.legal_moves() # Dont use weak_legal_moves() here!
-        move = choice(moves) 
+        move = chooseMove(self, self._mycolor, 2)
         self._board.push(move)
 
         # New here: allows to consider internal representations of moves
@@ -61,11 +61,11 @@ class myPlayer(PlayerInterface):
             to_ret = +10000
         for m in b.legal_moves():
             b.push(m)
-            res = self.MinMax(depth-1, not player)
+            res = self.MinMax(depth-1, Goban.Board.flip(player))
             b.pop()
             if(player and res > to_ret):
                 to_ret = res
-            elif(not player and res < to_ret):
+            elif(Goban.Board.flip(player) and res < to_ret):
                 to_ret = res
         return to_ret
 
@@ -83,6 +83,60 @@ class myPlayer(PlayerInterface):
             print("I won!!!")
         else:
             print("I lost :(!!")
+
+    def ABminimax(self, player, depth, alpha, beta):
+        if (depth == 0 or self._board.is_game_over()):
+            return self.heuristic()
+
+        if(player == self._mycolor):
+            best = -10000
+            moves = self._board.legal_moves()
+            for move in moves:
+                self._board.push(move)
+                player = self._opponent;
+                val = self.ABminimax(Goban.Board.flip(player), depth-1, alpha, beta)
+                self._board.pop()
+                best = max(best, val)
+                alpha = max(alpha, best)
+
+                if(beta <= alpha):
+                    break
+            return best
+        elif(player == self._opponent):
+            best = 10000
+            moves = self._board.legal_moves()
+            for move in moves:
+                self._board.push(move)
+                val = self.ABminimax(Goban.Board.flip(player), depth-1, alpha, beta)
+                self._board.pop()
+                best = min(best, val)
+                beta = min(alpha, best)
+
+                if(beta <= alpha):
+                    break
+            return best
+        else:
+            return 0
+
+def chooseMove(self, player, depth): #chooses the best first move by getting the min max value of each tree generated after the first move
+    #player = self._myColor
+    print("choose move")
+    if(self._board.is_game_over()):
+        return 'PASS'
+    to_ret_val = -10000
+    to_ret = []
+    moves = self._board.legal_moves()
+    for move in moves:
+        self._board.push(move)
+        res = self.ABminimax(Goban.Board.flip(player), depth, -10000, 10000)
+        self._board.pop()
+        if(res > to_ret_val):
+            to_ret_val = res
+            to_ret.clear
+            to_ret.append(move)
+        elif(res == to_ret_val):
+            to_ret.append(move)
+    return choice(to_ret)
 
     
 
