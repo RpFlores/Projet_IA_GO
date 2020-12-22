@@ -19,6 +19,7 @@ class MonteCarloTreeSearchNode(ABC):
 #======================CHANGED====================================================#
         self.move = None
         self.color = color
+        
 #=================================================================================#
 
     @property
@@ -73,7 +74,7 @@ class MonteCarloTreeSearchNode(ABC):
         return possible_moves[np.random.randint(len(possible_moves))]
 
 
-class TwoPlayersGameMonteCarloTreeSearchNode(MonteCarloTreeSearchNode):
+class nodeMCTS(MonteCarloTreeSearchNode):
 
     def __init__(self, state, color, parent=None):
         super().__init__(state, color, parent)
@@ -106,7 +107,7 @@ class TwoPlayersGameMonteCarloTreeSearchNode(MonteCarloTreeSearchNode):
         next_state = self.state.push(action)
 
 #======================CHANGED====================================================#
-        child_node = TwoPlayersGameMonteCarloTreeSearchNode(
+        child_node = nodeMCTS(
             next_state, self.color, parent=self)
         self.state.pop()
         self.children.append(child_node)
@@ -120,10 +121,14 @@ class TwoPlayersGameMonteCarloTreeSearchNode(MonteCarloTreeSearchNode):
 
     def rollout(self):
         current_rollout_state = self.state
+        if self.state == True:
+            print("TRUUUUUUUUUUUUUUUUUUEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+        else:
+            print("FALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLSSSSSSSSSSSSSSSE")
 
 #======================CHANGED====================================================#
         count = 0
-        while (not (current_rollout_state.is_game_over())): #endroit qui bug
+        while not current_rollout_state.is_game_over():
             possible_moves = current_rollout_state.legal_moves()
             action = self.rollout_policy(possible_moves)
             current_rollout_state = current_rollout_state.push(action)
