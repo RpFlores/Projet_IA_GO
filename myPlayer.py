@@ -6,9 +6,12 @@ Right now, this class contains the copy of the randomPlayer. But you have to cha
 '''
 
 import time
-import Goban 
+import Goban
 from random import choice
 from playerInterface import *
+from mctsClass import *
+from MCTSsearch import *
+
 
 class myPlayer(PlayerInterface):
     ''' Example of a random player for the go. The only tricky part is to be able to handle
@@ -21,6 +24,9 @@ class myPlayer(PlayerInterface):
         self._board = Goban.Board()
         self._mycolor = None
 
+    def currentColor(self):
+        return self._mycolor
+
     def getPlayerName(self):
         return "Random Player"
 
@@ -29,8 +35,19 @@ class myPlayer(PlayerInterface):
             print("Referee told me to play but the game is over!")
             return "PASS" 
         moves = self._board.legal_moves() # Dont use weak_legal_moves() here!
-        move = chooseMove(self, self._mycolor, 2)
+
+#============= CHANGED ================================#
+
+        move = chooseMove(self, self._mycolor, 1)# -> alpha beta
         self._board.push(move)
+
+        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        #root = nodeMCTS(self._board, self._mycolor)
+        #mcts = MonteCarloTreeSearch(root)
+       # move =  mcts.best_action(100)
+        #self._board.push(move)
+
+#=======================================================#
 
         # New here: allows to consider internal representations of moves
         print("I am playing ", self._board.move_to_str(move))
@@ -115,17 +132,18 @@ class myPlayer(PlayerInterface):
                 if(beta <= alpha):
                     break
             return best
-        else:
-            return 0
+        return 0
 
 def chooseMove(self, player, depth): #chooses the best first move by getting the min max value of each tree generated after the first move
     #player = self._myColor
     print("choose move")
     if(self._board.is_game_over()):
-        return 'PASS'
+        return Goban.Board.name_to_flat('PASS')
     to_ret_val = -10000
     to_ret = []
     moves = self._board.legal_moves()
+    if (len(moves) == 1):
+        return -1
     for move in moves:
         self._board.push(move)
         res = self.ABminimax(Goban.Board.flip(player), depth, -10000, 10000)
@@ -133,8 +151,9 @@ def chooseMove(self, player, depth): #chooses the best first move by getting the
         if(res > to_ret_val):
             to_ret_val = res
             to_ret.clear
-            to_ret.append(move)
-        elif(res == to_ret_val):
+            if(move != -1):
+                to_ret.append(move)
+        elif(res == to_ret_val and move != -1):
             to_ret.append(move)
     return choice(to_ret)
 
