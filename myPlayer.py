@@ -38,14 +38,14 @@ class myPlayer(PlayerInterface):
 
 #============= CHANGED ================================#
 
-        move = chooseMove(self, self._mycolor, 1)# -> alpha beta
-        self._board.push(move)
+       # move = chooseMove(self, self._mycolor, 1)# -> alpha beta
+       # self._board.push(move)
 
         #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        #root = nodeMCTS(self._board, self._mycolor)
-        #mcts = MonteCarloTreeSearch(root)
-       # move =  mcts.best_action(100)
-        #self._board.push(move)
+        root = nodeMCTS(self._board, self._mycolor)
+        mcts = MonteCarloTreeSearch(root)
+        move =  mcts.best_action(100)
+        self._board.push(move)
 
 #=======================================================#
 

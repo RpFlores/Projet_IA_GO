@@ -2,18 +2,15 @@ import numpy as np
 import Goban
 from collections import defaultdict
 from abc import ABC, abstractmethod
+import sys
+import time
 
 
 class MonteCarloTreeSearchNode(ABC):
 
-    def __init__(self, state, color, parent=None):
-        """
-        Parameters
-        ----------
-        state : mctspy.games.common.TwoPlayersAbstractGameState
-        parent : MonteCarloTreeSearchNode
-        """
-        self.state = state
+    def __init__(self, state1, color, parent=None):
+        
+        self.state = state1
         self.parent = parent
         self.children = [] #list of child nodes
 #======================CHANGED====================================================#
@@ -72,6 +69,9 @@ class MonteCarloTreeSearchNode(ABC):
 
     def rollout_policy(self, possible_moves):        
         return possible_moves[np.random.randint(len(possible_moves))]
+    
+    def getColor(self):
+        return self.color
 
 
 class nodeMCTS(MonteCarloTreeSearchNode):
@@ -93,8 +93,8 @@ class nodeMCTS(MonteCarloTreeSearchNode):
     @property
     def q(self):
 #======================CHANGED====================================================#
-        wins = self._results[Goban.Board.flip(self.parent.state.currentColor())]
-        loses = self._results[-1 * Goban.Board.flip(self.parent.state.currentColor())]
+        wins = self._results[Goban.Board.flip(self.parent.getColor())]
+        loses = self._results[-1 * Goban.Board.flip(self.parent.getColor())]
 #=================================================================================#
         return wins - loses
 
@@ -104,11 +104,11 @@ class nodeMCTS(MonteCarloTreeSearchNode):
 
     def expand(self):
         action = self.untried_actions.pop()
-        next_state = self.state.push(action)
+        self.state.push(action)
 
 #======================CHANGED====================================================#
         child_node = nodeMCTS(
-            next_state, self.color, parent=self)
+        self.state, self.color, parent=self)
         self.state.pop()
         self.children.append(child_node)
         child_node.correspondingMove(action)
@@ -121,17 +121,22 @@ class nodeMCTS(MonteCarloTreeSearchNode):
 
     def rollout(self):
         current_rollout_state = self.state
-        if self.state == True:
-            print("TRUUUUUUUUUUUUUUUUUUEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-        else:
-            print("FALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLSSSSSSSSSSSSSSSE")
+        #if(self.state):
+        #    exit("true")
+        #elif(not self.state):
+        #    exit("false")
+        #current_rollout_state = self.state
+        #if self.state == True:
+        #    print("TRUUUUUUUUUUUUUUUUUUEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+        #else:
+        #    print("FALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLSSSSSSSSSSSSSSSE")
 
 #======================CHANGED====================================================#
         count = 0
-        while not current_rollout_state.is_game_over():
+        while ( not current_rollout_state.is_game_over() ):
             possible_moves = current_rollout_state.legal_moves()
             action = self.rollout_policy(possible_moves)
-            current_rollout_state = current_rollout_state.push(action)
+            current_rollout_state.push(action)
 
             count += 1
         result = current_rollout_state.result() # result is a string with the score
@@ -174,6 +179,9 @@ class nodeMCTS(MonteCarloTreeSearchNode):
             return result
         else:
             return -result
+    
+    
+
 #======================================================#   
 
         
