@@ -4,6 +4,7 @@ from collections import defaultdict
 from abc import ABC, abstractmethod
 import sys
 import time
+import copy
 
 
 class MonteCarloTreeSearchNode(ABC):
@@ -93,8 +94,8 @@ class nodeMCTS(MonteCarloTreeSearchNode):
     @property
     def q(self):
 #======================CHANGED====================================================#
-        wins = self._results[Goban.Board.flip(self.parent.getColor())]
-        loses = self._results[-1 * Goban.Board.flip(self.parent.getColor())]
+        wins = self._results[self.getColor()]
+        loses = self._results[Goban.Board.flip(self.getColor())]
 #=================================================================================#
         return wins - loses
 
@@ -103,15 +104,20 @@ class nodeMCTS(MonteCarloTreeSearchNode):
         return self._number_of_visits
 
     def expand(self):
-        action = self.untried_actions.pop()
+        if(len(self.untried_actions) <= 1):
+            action = self.untried_actions.pop()
+        else:
+            action = self.untried_actions.pop()
+            action = self.untried_actions.pop()
         self.state.push(action)
 
 #======================CHANGED====================================================#
+        #creates new node with a copy of the board with the new random move and returns it
         child_node = nodeMCTS(
-        self.state, self.color, parent=self)
-        self.state.pop()
-        self.children.append(child_node)
+        copy.deepcopy(self.state), self.color, parent=self)
         child_node.correspondingMove(action)
+        self.children.append(child_node)
+        self.state.pop()
 #=================================================================================#
 
         return child_node
@@ -121,16 +127,6 @@ class nodeMCTS(MonteCarloTreeSearchNode):
 
     def rollout(self):
         current_rollout_state = self.state
-        #if(self.state):
-        #    exit("true")
-        #elif(not self.state):
-        #    exit("false")
-        #current_rollout_state = self.state
-        #if self.state == True:
-        #    print("TRUUUUUUUUUUUUUUUUUUEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-        #else:
-        #    print("FALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLSSSSSSSSSSSSSSSE")
-
 #======================CHANGED====================================================#
         count = 0
         while ( not current_rollout_state.is_game_over() ):
@@ -143,7 +139,7 @@ class nodeMCTS(MonteCarloTreeSearchNode):
         while(count > 0): #we pop the moves  we pushed
             count = count-1
             current_rollout_state.pop()
-        return self.resultToInt(result) #we return the winner (1 -1 or 0) depending on the score.
+        return self.resultToInt(result) #we return the winner (0 1 2) depending on the score.
 #=================================================================================#
 
 
@@ -167,18 +163,18 @@ class nodeMCTS(MonteCarloTreeSearchNode):
     #transforms the score "0-1" to -1 (black wins)
     #transforms the score "1/2-1/2" to 0 (draw)
     def resultToInt(self, result): 
-        result = 0
+        result_to_return = 0
         if result == "1-0":
-            result = 1
+            result_to_return = 1
         elif result == "0-1":
-            result -1
+            result_to_return = 2
         else:
-            result = 0
+            result_to_return = 0
         
-        if self.color == 1:
-            return result
-        else:
-            return -result
+        return result_to_return
+        
+
+
     
     
 

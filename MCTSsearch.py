@@ -1,12 +1,6 @@
 class MonteCarloTreeSearch(object):
 
     def __init__(self, node):
-        """
-        MonteCarloTreeSearchNode
-        Parameters
-        ----------
-        node : mctspy.tree.nodes.MonteCarloTreeSearchNode
-        """
         self.root = node
 
     def best_action(self, simulations_number):
