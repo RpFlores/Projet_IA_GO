@@ -30,24 +30,43 @@ class myPlayer(PlayerInterface):
     def getPlayerName(self):
         return "Random Player"
 
+    def intersection(self,lst1, lst2): 
+        lst3 = [value for value in lst1 if value in lst2] 
+        return lst3 
+
+    def ouverture(self,legal_moves):
+        ouvertures = ['C9', 'C8', 'B7',  'A7', 'G9', 'G8', 'H7', 'J7',
+        'A3', 'B3', 'C2', 'C1', 'G1', 'G2', 'H3', 'J3']
+        moves= []
+        for m in ouvertures:
+            moves.append(self._board.name_to_flat(m))
+        return self.intersection(moves, legal_moves)
+
     def getPlayerMove(self):
         if self._board.is_game_over():
             print("Referee told me to play but the game is over!")
             return "PASS" 
         moves = self._board.legal_moves() # Dont use weak_legal_moves() here!
 
-#============= CHANGED ================================#
+        ouvertures = self.ouverture(moves)
+        
+        if len(ouvertures)>=1:
+            print("ouvertures possibles :")
+            print(ouvertures)
+            move = ouvertures.pop()
+        else :  
+        
 
-       # move = chooseMove(self, self._mycolor, 1)# -> alpha beta
-       # self._board.push(move)
+            move = chooseMove(self, self._mycolor, 1)
+            # move = chooseMove(self, self._mycolor, 1)# -> alpha beta
+            # self._board.push(move)
 
-        #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        root = nodeMCTS(self._board, self._mycolor)
-        mcts = MonteCarloTreeSearch(root)
-        move =  mcts.best_action(100)
+            #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+            root = nodeMCTS(self._board, self._mycolor)
+            mcts = MonteCarloTreeSearch(root)
+            move =  mcts.best_action(100)
+
         self._board.push(move)
-
-#=======================================================#
 
         # New here: allows to consider internal representations of moves
         print("I am playing ", self._board.move_to_str(move))
