@@ -74,6 +74,22 @@ class myPlayer(PlayerInterface):
         self._board.prettyPrint()
         # move is an internal representation. To communicate with the interface I need to change if to a string
         return Goban.Board.flat_to_name(move) 
+    
+    def heuristic2(self):
+        cpt = 0
+        pieces = []
+        for p in :
+            if len(self._neighbors) != 0:
+                pieces.append(p)
+                for v in p._neighbors :
+                #for v in _get_neighbors:
+                    if v not in pieces:
+                        pieces.append(v)
+                        cpt = cpt + 1
+            else :
+                cpt = cpt - 1
+        return cpt
+
 
     def heuristic(self):
         score = 0 
