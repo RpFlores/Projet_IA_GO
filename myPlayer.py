@@ -49,7 +49,6 @@ class myPlayer(PlayerInterface):
         moves = self._board.legal_moves() # Dont use weak_legal_moves() here!
 
         ouvertures = self.ouverture(moves)
-        
         if len(ouvertures)>=1:
             print("ouvertures possibles :")
             print(ouvertures)
@@ -57,14 +56,14 @@ class myPlayer(PlayerInterface):
         else :  
         
 
-            move = chooseMove(self, self._mycolor, 1)
-            # move = chooseMove(self, self._mycolor, 1)# -> alpha beta
-            # self._board.push(move)
+            # alpha beta
+            move = chooseMove(self, self._mycolor, 2)
 
-            #print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-            root = nodeMCTS(self._board, self._mycolor)
-            mcts = MonteCarloTreeSearch(root)
-            move =  mcts.best_action(100)
+            #Décommenter pour faire tourner monte carlo:
+
+            #root = nodeMCTS(self._board, self._mycolor)
+            #mcts = MonteCarloTreeSearch(root)
+            #move =  mcts.best_action(100)
 
         self._board.push(move)
 
@@ -75,26 +74,37 @@ class myPlayer(PlayerInterface):
         # move is an internal representation. To communicate with the interface I need to change if to a string
         return Goban.Board.flat_to_name(move) 
     
-    def heuristic2(self):
+    def heuristic2(self, move, move_color):
+        
         cpt = 0
-        pieces = []
-        for p in :
-            if len(self._neighbors) != 0:
-                pieces.append(p)
-                for v in p._neighbors :
-                #for v in _get_neighbors:
-                    if v not in pieces:
-                        pieces.append(v)
-                        cpt = cpt + 1
-            else :
-                cpt = cpt - 1
-        return cpt
+        if(move_color != self._mycolor):
+            return cpt
+        
+        nbEmpty = 0
+        nbSameColor = 0
+        i = self._board._neighborsEntries[move]
+        while self._board._neighbors[i] != -1:
+            n = self._board._neighbors[i]
+            if  n == Goban.Board._EMPTY:
+                nbEmpty += 1
+            elif n == self._mycolor:
+                nbSameColor += 1
+            i += 1
+        
+        
+        if(nbEmpty == i):
+                cpt = -2
+        elif(nbSameColor == i):
+                cpt = -1
+        elif(nbSameColor != 0):
+                cpt += 1
+        return cpt*2
 
 
     def heuristic(self):
         score = 0 
-        (black, white) = self._board.compute_score()
-        if(self._mycolor == "white"):
+        (black, white) = (self._board._nbBLACK, self._board._nbWHITE)
+        if(self._mycolor == Goban.Board._WHITE):
             score = white - black
             return score
         else:
@@ -136,9 +146,9 @@ class myPlayer(PlayerInterface):
         else:
             print("I lost :(!!")
 
-    def ABminimax(self, player, depth, alpha, beta):
+    def ABminimax(self, player, depth, alpha, beta, move):
         if (depth == 0 or self._board.is_game_over()):
-            return self.heuristic()
+            return self.heuristic2(move, self._mycolor) + self.heuristic()
 
         if(player == self._mycolor):
             best = -10000
@@ -146,7 +156,7 @@ class myPlayer(PlayerInterface):
             for move in moves:
                 self._board.push(move)
                 player = self._opponent;
-                val = self.ABminimax(Goban.Board.flip(player), depth-1, alpha, beta)
+                val = self.ABminimax(Goban.Board.flip(player), depth-1, alpha, beta, move)
                 self._board.pop()
                 best = max(best, val)
                 alpha = max(alpha, best)
@@ -159,7 +169,7 @@ class myPlayer(PlayerInterface):
             moves = self._board.legal_moves()
             for move in moves:
                 self._board.push(move)
-                val = self.ABminimax(Goban.Board.flip(player), depth-1, alpha, beta)
+                val = self.ABminimax(Goban.Board.flip(player), depth-1, alpha, beta, move)
                 self._board.pop()
                 best = min(best, val)
                 beta = min(alpha, best)
@@ -181,7 +191,7 @@ def chooseMove(self, player, depth): #chooses the best first move by getting the
         return -1
     for move in moves:
         self._board.push(move)
-        res = self.ABminimax(Goban.Board.flip(player), depth, -10000, 10000)
+        res = self.ABminimax(Goban.Board.flip(player), depth, -10000, 10000, move)
         self._board.pop()
         if(res > to_ret_val):
             to_ret_val = res
