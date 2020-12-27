@@ -35,7 +35,7 @@ class MonteCarloTreeSearch(object):
 
         Returns
         -------
-
+        the node not yet visited
         """
         current_node = self.root
         while not current_node.is_terminal_node():

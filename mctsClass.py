@@ -27,7 +27,7 @@ class MonteCarloTreeSearchNode(ABC):
 
         Returns
         -------
-        list of mctspy.games.common.AbstractGameAction
+        list of legal moves
 
         """
         pass
